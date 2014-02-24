@@ -1,37 +1,59 @@
 #! /usr/bin/python3
 """
 Find the 10001th prime number (6th is 13).
-I think I can nail this with list comprehensions!
+Originally though to do this with list comprehensions
+but the better implementation was with a slick verion of a prime
+number generator from http://code.activestate.com/recipes/117119/
+More power to ya, Sieve of Eratosthenes
 """
-def get_primes(n):
+# prime number generator with comment!
+def gen_primes():
+    """ Generate an infinite sequence of prime numbers.
+    """
+    # Maps composites to primes witnessing their compositeness.
+    # This is memory efficient, as the sieve is not "run forward"
+    # indefinitely, but only as long as required by the current
+    # number being tested.
+    #
+    D = {}
 
-  # generate a list of non-primes for comparrison
-  nonprimes = [j for i in range(2,n) for j in range(i*2,n,i)]
+    # The running integer that's checked for primeness
+    q = 2
 
-  # using non-primes we can find a list of primes to the nth number
-  primes = [x for x in range(2,n) if x not in nonprimes]
+    while True:
+        if q not in D:
+            # q is a new prime.
+            # Yield it and mark its first multiple that isn't
+            # already marked in previous iterations
+            #
+            yield q
+            D[q * q] = [q]
+        else:
+            # q is composite. D[q] is the list of primes that
+            # divide it. Since we've reached q, we no longer
+            # need it in the map, but we'll mark the next
+            # multiples of its witnesses to prepare for larger
+            # numbers
+            #
+            for p in D[q]:
+                D.setdefault(p + q, []).append(p)
+            del D[q]
 
-  return primes
+        q += 1
 
-"""
-Prime number tester
-"""
-def is_prime(n):
 
-  # check for positive integer
-  n = abs(int(n))
+def prime_list(max):
 
-  # 0 and 1 are NOT prime
-  if n < 2:
-    return False
-  # 2 is the only "even" prime
-  if n == 2:
-    return True
-  # all other even numbers are not prime
-  if not n & 1:
-    return False
-  # range begins with 3 and goes to square root of n for all odd numbers
-  for x in range(3,int(n**0.5)+1,2):
-    if n % x == 0:
-      return False
-  return True
+  gen = gen_primes()
+  plist = []
+  count = 0
+
+  for i in gen:
+    plist.append(i)
+    count += 1
+    if count >= max:
+      break
+
+  return plist
+
+
