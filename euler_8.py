@@ -68,7 +68,7 @@ def largest_product():
 
 
   for i in range(5):        # create a five-item queue
-    q.enqueue(rbns[i+count])
+    q.enqueue(rbns[i])
     count += 1
 
   product = q.product()
